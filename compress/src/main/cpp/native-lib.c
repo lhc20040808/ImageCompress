@@ -116,7 +116,7 @@ int generateJPEG(BYTE *data, int w, int h, jint quality, const char *name, boole
     jcs.err = jpeg_std_error(&jem.pub);
     jem.pub.error_exit = jpeg_error_exit;
 
-    if (setjmp(jmp_buffer)) {
+    if (setjmp(jem.setjmp_buffer)) {
         return COMPRESS_SET_JMP_FAIL;
     }
     //初始化jpeg对象
