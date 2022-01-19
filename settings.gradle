@@ -1,0 +1,3 @@
+rootProject.name = "ImageCompress"
+include ':app'
+include ':compress'
