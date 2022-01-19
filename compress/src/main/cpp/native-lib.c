@@ -7,6 +7,8 @@ typedef u_int8_t BYTE;
 
 const char *jstring2String(JNIEnv *env, jstring jstr);
 
+int generateJPEG(BYTE *data, int w, int h, jint quality, const char *name);
+
 JNIEXPORT jstring JNICALL
 Java_com_zhaodong_compress_ImageCompress_stringFromJNI(JNIEnv *env, jobject thiz) {
     char str[] = "Hello World";
@@ -68,14 +70,14 @@ Java_com_zhaodong_compress_ImageCompress_nativeCompressBitmap(JNIEnv *env, jobje
 
     AndroidBitmap_unlockPixels(env, bitmap);
     //进行压缩
-
+    ret = generateJPEG(tmpData, w, h, quality, dstFilePath);
     free((void *) dstFilePath);
     free((void *) tmpData);
     return ret;
 }
 
 const char *jstring2String(JNIEnv *env, jstring jstr) {
-    char *ret;
+    char *ret = NULL;
     const char *tempStr = (*env)->GetStringUTFChars(env, jstr, NULL);
     jsize len = (*env)->GetStringUTFLength(env, jstr);
     if (len > 0) {
@@ -85,4 +87,8 @@ const char *jstring2String(JNIEnv *env, jstring jstr) {
     }
     (*env)->ReleaseStringUTFChars(env, jstr, tempStr);
     return ret;
+}
+
+int generateJPEG(BYTE *data, int w, int h, jint quality, const char *name) {
+
 }
