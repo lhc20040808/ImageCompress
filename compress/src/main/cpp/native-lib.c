@@ -3,11 +3,31 @@
 #include "compress.h"
 #include <sys/types.h>
 
+#define COMPRESS_OPEN_DST_FILE_ERROR -3
+#define COMPRESS_DEL_ALPHA_FAIL -2
+#define COMPRESS_SET_JMP_FAIL -1
+#define COMPRESS_SUCCESS 1
+
 typedef u_int8_t BYTE;
+
+struct my_error_mgr {
+    struct jpeg_error_mgr pub;
+    jmp_buf setjmp_buffer;
+};
+
+METHODDEF(void)
+jpeg_error_exit(j_common_ptr
+                cinfo) {
+    struct my_error_mgr *myerr = (struct my_error_mgr *) cinfo->err;
+    (*cinfo->err->output_message)(cinfo);
+    LOGW("jpeg_message_table[%d]:%s",
+         myerr->pub.msg_code, myerr->pub.jpeg_message_table[myerr->pub.msg_code]);
+    longjmp(myerr->setjmp_buffer, 1);
+}
 
 const char *jstring2String(JNIEnv *env, jstring jstr);
 
-int generateJPEG(BYTE *data, int w, int h, jint quality, const char *name);
+int generateJPEG(BYTE *data, int w, int h, jint quality, const char *name, boolean optimize);
 
 JNIEXPORT jstring JNICALL
 Java_com_zhaodong_compress_ImageCompress_stringFromJNI(JNIEnv *env, jobject thiz) {
@@ -63,14 +83,14 @@ Java_com_zhaodong_compress_ImageCompress_nativeCompressBitmap(JNIEnv *env, jobje
                 data += 3;
                 pixelsColor += 4;
             } else {
-                return -2;
+                return COMPRESS_DEL_ALPHA_FAIL;
             }
         }
     }
 
     AndroidBitmap_unlockPixels(env, bitmap);
     //进行压缩
-    ret = generateJPEG(tmpData, w, h, quality, dstFilePath);
+    ret = generateJPEG(tmpData, w, h, quality, dstFilePath, true);
     free((void *) dstFilePath);
     free((void *) tmpData);
     return ret;
@@ -89,6 +109,48 @@ const char *jstring2String(JNIEnv *env, jstring jstr) {
     return ret;
 }
 
-int generateJPEG(BYTE *data, int w, int h, jint quality, const char *name) {
+int generateJPEG(BYTE *data, int w, int h, jint quality, const char *name, boolean optimize) {
+    struct jpeg_compress_struct jcs;
+    struct my_error_mgr jem;
 
+    jcs.err = jpeg_std_error(&jem.pub);
+    jem.pub.error_exit = jpeg_error_exit;
+
+    if (setjmp(jmp_buffer)) {
+        return COMPRESS_SET_JMP_FAIL;
+    }
+    //初始化jpeg对象
+    jpeg_create_compress(&jcs);
+
+    FILE *file = fopen(name, "wb");
+    if (file == NULL) {
+        return COMPRESS_OPEN_DST_FILE_ERROR;
+    }
+    jpeg_stdio_dest(&jcs, file);
+    jcs.image_width = w;
+    jcs.image_height = h;
+    jcs.arith_code = false;
+    jcs.input_components = 3;
+    jcs.in_color_space = JCS_RGB;
+    jpeg_set_defaults(&jcs);
+    //是否使用哈夫曼编码 0不使用哈夫曼编码 1使用哈夫曼编码
+    jcs.optimize_coding = optimize;
+    //设定压缩参数
+    jpeg_set_quality(&jcs, quality, true);
+    //开始压缩
+    jpeg_start_compress(&jcs, true);
+
+    JSAMPROW row_point[1];
+    int row_stride = jcs.image_width * 3;
+    while (jcs.next_scanline < jcs.image_height) {
+        row_point[0] = &data[jcs.next_scanline * row_stride];
+        jpeg_write_scanlines(&jcs, row_point, 1);
+    }
+
+    //压缩完毕
+    jpeg_finish_compress(&jcs);
+    //释放资源
+    jpeg_destroy_compress(&jcs);
+    fclose(file);
+    return COMPRESS_SUCCESS;
 }

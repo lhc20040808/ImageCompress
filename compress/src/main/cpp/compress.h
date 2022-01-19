@@ -4,6 +4,8 @@
 #include "lang.h"
 #include <stdlib.h>
 #include <android/bitmap.h>
+#include <setjmp.h>
+#include <jpeglib.h>
 
 
 void getStr(char *str);
