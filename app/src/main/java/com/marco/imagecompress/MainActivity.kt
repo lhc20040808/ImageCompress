@@ -17,6 +17,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val compress = ImageCompress()
-        binding.sampleText.text = compress.stringFromJNI();
+        binding.sampleText.text = compress.stringFromJNI()
     }
 }

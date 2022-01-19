@@ -1,7 +1,12 @@
 #include <jni.h>
 #include <string.h>
-#include "compress.h"
 #include <sys/types.h>
+
+#include "lang.h"
+#include <stdlib.h>
+#include <android/bitmap.h>
+#include <setjmp.h>
+#include <jpeglib.h>
 
 #define COMPRESS_OPEN_DST_FILE_ERROR -3
 #define COMPRESS_DEL_ALPHA_FAIL -2
@@ -31,7 +36,7 @@ int generateJPEG(BYTE *data, int w, int h, jint quality, const char *name, boole
 
 JNIEXPORT jstring JNICALL
 Java_com_zhaodong_compress_ImageCompress_stringFromJNI(JNIEnv *env, jobject thiz) {
-    char str[] = "Hello World";
+    char str[] = "Hello World C++";
     return (*env)->NewStringUTF(env, str);
 }
 
