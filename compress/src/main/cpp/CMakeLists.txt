@@ -8,7 +8,7 @@ set(include_dir ./include)
 #添加头文件目录
 include_directories(${include_dir})
 
-add_library(native-lib SHARED native-lib.cpp compress.c)
+add_library(native-lib SHARED native-lib.c compress.c)
 add_library(libjpeg SHARED IMPORTED)
 
 find_library(log-lib log)
