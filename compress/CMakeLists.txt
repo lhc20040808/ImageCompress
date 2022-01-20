@@ -2,13 +2,14 @@ cmake_minimum_required(VERSION 3.10.2)
 
 project("imagecompress")
 
-set(lib_dir ${PROJECT_SOURCE_DIR}/../../../libs)
-set(include_dir ./include)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/jniLibs/${ANDROID_ABI})
+set(lib_dir ${PROJECT_SOURCE_DIR}/libs)
+set(include_dir src/main/cpp/include)
 
 #添加头文件目录
 include_directories(${include_dir})
 
-add_library(native-lib SHARED native-lib.c)
+add_library(native-lib SHARED src/main/cpp/native-lib.c)
 add_library(libjpeg SHARED IMPORTED)
 
 find_library(log-lib log)
