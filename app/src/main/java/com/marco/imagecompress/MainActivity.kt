@@ -62,11 +62,9 @@ class MainActivity : AppCompatActivity() {
                 val index = picturePath.lastIndexOf("/")
                 val orgName = picturePath.substring(index + 1)
                 val bitmap = BitmapFactory.decodeFile(picturePath)
-                val newFilePath =
-                    Environment.getExternalStorageDirectory().absolutePath + "/Pictures/Screenshots/${
-                        orgName.replace("org",
-                            "dst")
-                    }"
+                val newFilePath = "${picturePath.substring(0, index)}/${
+                    orgName.replace("org", "dst")
+                }"
                 val dstFile = File(newFilePath)
                 if (dstFile.exists()) {
                     dstFile.delete()
