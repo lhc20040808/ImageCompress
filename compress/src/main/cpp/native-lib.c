@@ -43,7 +43,7 @@ Java_com_zhaodong_compress_ImageCompress_stringFromJNI(JNIEnv *env, jobject thiz
 JNIEXPORT jint JNICALL
 Java_com_zhaodong_compress_ImageCompress_nativeCompressBitmap(JNIEnv *env, jobject thiz,
                                                               jobject bitmap, jint quality,
-                                                              jstring des_path, jboolean optimize) {
+                                                              jstring des_path) {
     AndroidBitmapInfo androidBitmapInfo;
     BYTE *pixelsColor;
     int ret;

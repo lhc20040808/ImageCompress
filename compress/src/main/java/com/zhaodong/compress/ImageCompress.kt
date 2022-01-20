@@ -30,6 +30,5 @@ class ImageCompress {
         bitmap: Bitmap,
         quality: Int,
         desPath: String?,
-        optimize: Boolean
     ): Int
 }
