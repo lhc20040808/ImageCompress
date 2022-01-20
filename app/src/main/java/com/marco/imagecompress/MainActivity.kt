@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 dstFile.createNewFile()
                 val compress = ImageCompress()
-                val ret = compress.nativeCompressBitmap(bitmap, 100, newFilePath)
+                val ret = compress.nativeCompressBitmap(bitmap, 60, newFilePath)
                 Log.d("lhc", "压缩结果:$ret newFilePath:${newFilePath}")
                 val orgSize = orgFile.length()
                 val dstSize = File(newFilePath).length()
